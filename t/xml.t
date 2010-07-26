@@ -5,7 +5,7 @@ BEGIN {
 	@*INC.push('lib');
 }
 
-plan 8;
+plan 10;
 
 use XML::SAX;
 ok 1, 'ok';
@@ -38,7 +38,9 @@ is @parsed[0], 'chapter', 'chapter';
 is $xml.string, '', 'string is empty';
 is $xml.stack[0], 'chapter', 'stack is chapter';
 
-#$xml.reset;
+$xml.reset;
+is $xml.string, '', 'string is empty';
+is $xml.stack.elems, 0, 'stack is empty';
 
 
 #ok @parsed ~~ ['chapter'], 'parsed chapter';

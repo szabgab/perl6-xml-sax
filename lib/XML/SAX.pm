@@ -19,6 +19,11 @@ method done() {
 	die "Still in stack: { @!stack }" if @!stack;
 }
 
+method reset() {
+	$!string = '';
+	@!stack = ();
+}
+
 
 method start_elem($elem) {
 	...
