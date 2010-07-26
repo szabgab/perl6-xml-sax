@@ -13,6 +13,13 @@ method parse($str) {
 	}
 }
 
+method done() {
+	return 1 if $string eq '' and not @stack;
+	die "Left overs string: '$string'" if $string;
+	die "Still in stack: { @stack }" if @stack;
+}
+
+
 method start_elem($elem) {
 	...
 }
