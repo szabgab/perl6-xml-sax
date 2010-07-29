@@ -5,7 +5,7 @@ BEGIN {
 	@*INC.push('lib');
 }
 
-plan 10+8+1+3;
+plan 10+8+6;
 
 use XML::SAX;
 ok 1, 'ok';
@@ -27,6 +27,8 @@ class XML::SAX::Test is XML::SAX {
 
 my $xml = XML::SAX::Test.new;
 is $xml.WHAT, 'XML::SAX::Test()', 'XML::SAX::Test constructor';
+
+#----------------
 
 $xml.parse('<chapter>');
 is @parsed.elems, 1, 'one element';
@@ -50,7 +52,7 @@ $xml.reset;
 is $xml.string, '', 'string is empty';
 is $xml.stack.elems, 0, 'stack is empty';
 
-# ----------------
+#----------------
 
 @parsed = ();
 $xml.parse('<chapter>');
@@ -65,8 +67,11 @@ is @parsed[1][0], 'end_elem', 'end_elem';
 is @parsed[1][1], 'chapter', 'chapter end';
 
 
+#----------------
+
 @parsed = ();
 my $exception;
+$xml.reset;
 {
 	$xml.parse('</chapter>');
 	CATCH {
@@ -74,9 +79,11 @@ my $exception;
 	}
 }
 is $exception, "End element 'chapter' reached while stack was empty", 'exception on single </chapter>';
-$xml.reset;
+
+#----------------
 
 @parsed = ();
+$xml.reset;
 $xml.parse('<chapter><page></page></chapter>');
 $xml.done;
 is $xml.string, '', 'string is empty';
@@ -87,23 +94,35 @@ is @parsed.elems, 4, '4 elems';
 #is @parsed[1][0], 'end_elem', 'end_elem';
 #is @parsed[1][1], 'chapter', 'chapter end';
 
+#----------------
 
-# @parsed = ();
-# $exception = '';
-# {
-	# #$xml.parse('<chapter><page></chapter>');
-	# $xml.parse('</chapter>');
-	# CATCH {
-		# $exception = $_;
-	# }
-# }
+@parsed = ();
+$exception = '';
+$xml.reset;
+my $str = '<chapter><page></chapter>';
+{
+	$xml.parse($str);
+	CATCH {
+		$exception = $_;
+	}
+}
+is $exception, "End element 'chapter' reached while in 'page' element", $str;
+
+#----------------
+
+@parsed = ();
+$exception = '';
+$xml.reset;
+$str = '<chapter><page></page></page></chapter>';
+{
+	$xml.parse($str);
+	CATCH {
+		$exception = $_;
+	}
+}
+is $exception, "End element 'page' reached while in 'chapter' element", $str;
+
 # note "Ex: $exception";
-# #is $exception, "", 'exception on single </chapter>';
-
-# TODO: test these:
-# 
-# <chapter><page></page></page></chapter>
-
 
 # TODO: 
 #   call process on data items
