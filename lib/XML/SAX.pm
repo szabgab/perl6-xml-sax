@@ -8,10 +8,9 @@ has @.stack;
 
 my token element { \w+ }
 my token name    { \w+ }
-my regex value   { <-[\"]>* }
-#my rule opening { \< <element=&element> \> }
+my token value   { <-[\"]>* }
 my rule attr { [<name=&name>\=\"<value=&value>\"] }
-
+my rule text { <-[\<]>+ }
 my rule opening { \< <element=&element> <attr=&attr>* \> }
 my regex closing { \<\/ <element=&element> \> }
 
@@ -19,7 +18,7 @@ my regex closing { \<\/ <element=&element> \> }
 method parse($str) {
 	$!string ~= $str;
 
-	while $!string ~~ m/^ [ <opening=&opening> || <closing=&closing> ] / {
+	while $!string ~~ m/^ [ <opening=&opening> || <closing=&closing> || <text=&text> ] / {
 		#note $!string;
 		#note $/;
 		$!string .= substr($/.to);
@@ -47,6 +46,13 @@ method parse($str) {
 				die "End element '$/<closing><element>' reached while in '$last' element";
 			}
 			self.end_elem($last);
+		} elsif $/<text> {
+			if not @!stack {
+				die "Text seen outside of all elements";
+			}
+			#note $/<text>;
+			@!stack[*-1].content.push($/<text>);
+			self.content(@!stack[*-1]);
 		} else {
 			die "Invalid"
 		}
@@ -70,5 +76,9 @@ method start_elem($elem) {
 }
 
 method end_elem($elem) {
+	...
+}
+
+method content($elem) {
 	...
 }

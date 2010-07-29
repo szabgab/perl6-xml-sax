@@ -5,7 +5,7 @@ BEGIN {
 	@*INC.push('lib');
 }
 
-plan 10+8+6+12;
+plan 10+8+6+12+20;
 
 use XML::SAX;
 ok 1, 'ok';
@@ -17,6 +17,9 @@ class XML::SAX::Test is XML::SAX {
 	}
 	method end_elem($elem) {
 		@parsed.push(['end_elem', $elem]);
+	}
+	method content($elem) {
+		@parsed.push(['content', $elem]);
 	}
 }
 
@@ -135,7 +138,6 @@ is @parsed[1][1], 'chapter', 'chapter end';
 
 {
 	reset_all();
-	my $exception;
 
 	my $str = '<chapter id="12" name="perl"  ></chapter>';
 	$xml.parse($str);
@@ -157,10 +159,43 @@ is @parsed[1][1], 'chapter', 'chapter end';
 
 #----------------
 
+{
+	reset_all();
+	diag 'content';
+
+	my $str = '<chapter> before <para>this is the text</para> after </chapter>';
+	$xml.parse($str);
+	$xml.done;
+	is $xml.string, '', 'string is empty';
+	is $xml.stack.elems, 0, 'stack is empty';
+	is @parsed.elems, 7, '7 elems';
+	is @parsed[0][0], 'start_elem', 'start_elem';
+	is @parsed[0][1], 'chapter', 'chapter start';
+
+	is @parsed[1][0], 'content', 'content';
+	is @parsed[1][1], 'chapter', ' text before';
+	is @parsed[1][1].content[0], ' before ', 'text before';
+
+	is @parsed[2][0], 'start_elem', 'start_elem';
+	is @parsed[2][1], 'para', 'para start';
+
+	is @parsed[3][0], 'content', 'content';
+	is @parsed[3][1], 'para', ' text inside';
+	is @parsed[3][1].content[0], 'this is the text', 'this is the text';
+
+	is @parsed[4][0], 'end_elem', 'end_elem';
+	is @parsed[4][1], 'para', 'para end';
+
+	is @parsed[5][0], 'content', 'content';
+	is @parsed[5][1], 'chapter', 'text after';
+	is @parsed[5][1].content[1], ' after ', 'text after';
+	
+	is @parsed[6][0], 'end_elem', 'end_elem';
+	is @parsed[6][1], 'chapter', 'chapter end';
+}
+
 # note "Ex: $exception";
 # TODO: 
-#   call process on data items
-#   include attributes in start_elem 
 #   parse data given in a file
 
 
