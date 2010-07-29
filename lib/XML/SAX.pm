@@ -3,26 +3,44 @@ class XML::SAX;
 has $.string = '';
 has @.stack;
 
+my token element { \w+ };
+my regex opening { \< <element=&element> \> }
+my regex closing { \<\/ <element=&element> \> }
+
+# TODO Rakudofix: replace <opening=&opening> by <opening>
 method parse($str) {
 	$!string ~= $str;
-	
-	if $!string ~~ m/^ \< (\w+) \> / {
+
+	while $!string ~~ m/^ <opening=&opening> || <closing=&closing> / {
 		$!string .= substr($/.to);
-		@!stack.push($/[0]);
-		self.start_elem($/[0]);
+		if $/<opening> {
+			@!stack.push($/<opening><element>);
+			self.start_elem($/<opening><element>);
+		} elsif $/<closing> {
+			if not @!stack {
+				die "End element '$/<closing><element>' reached while stack was empty";
+			}
+			my $last = @!stack.pop;
+			if $last ne $/<closing><element> {
+				die "End element '$/<closing><element>' reached while in '$last' element";
+			}
+			self.end_elem($/<closing><element>);
+		} else {
+			die "Invalid"
+		}
 	}
 
-	if $!string ~~ m/^ \<\/ (\w+) \> / {
-		$!string .= substr($/.to);
-		if not @!stack {
-			die "End element '$/[0]' reached while stack was empty";
-		}
-		my $last = @!stack.pop;
-		if $last ne $/[0] {
-			die "End element '$/[0]' reached while in '$last' element";
-		}
-		self.end_elem($/[0]);
-	}
+	# if $!string ~~ m/^ <closing=&closing> / {
+		# $!string .= substr($/.to);
+		# if not @!stack {
+			# die "End element '$/<closing><element>' reached while stack was empty";
+		# }
+		# my $last = @!stack.pop;
+		# if $last ne $/<closing><element> {
+			# die "End element '$/<closing><element>' reached while in '$last' element";
+		# }
+		# self.end_elem($/<closing><element>);
+	# }
 }
 
 method done() {
