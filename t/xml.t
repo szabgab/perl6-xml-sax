@@ -69,76 +69,84 @@ is @parsed[1][1], 'chapter', 'chapter end';
 
 #----------------
 
-@parsed = ();
-my $exception;
-$xml.reset;
 {
-	$xml.parse('</chapter>');
-	CATCH {
-		$exception = $_;
+	reset_all();
+	my $exception;
+	{
+		$xml.parse('</chapter>');
+		CATCH {
+			$exception = $_;
+		}
 	}
+	is $exception, "End element 'chapter' reached while stack was empty", 'exception on single </chapter>';
 }
-is $exception, "End element 'chapter' reached while stack was empty", 'exception on single </chapter>';
-
 #----------------
 
-@parsed = ();
-$xml.reset;
-$xml.parse('<chapter><page></page></chapter>');
-$xml.done;
-is $xml.string, '', 'string is empty';
-is $xml.stack.elems, 0, 'stack is empty';
-is @parsed.elems, 4, '4 elems';
-#is @parsed[0][0], 'start_elem', 'start_elem';
-#is @parsed[0][1], 'chapter', 'chapter start';
-#is @parsed[1][0], 'end_elem', 'end_elem';
-#is @parsed[1][1], 'chapter', 'chapter end';
-
-#----------------
-
-@parsed = ();
-$exception = '';
-$xml.reset;
-my $str = '<chapter><page></chapter>';
 {
+	reset_all();
+	my $exception;
+
+	$xml.parse('<chapter><page></page></chapter>');
+	$xml.done;
+	is $xml.string, '', 'string is empty';
+	is $xml.stack.elems, 0, 'stack is empty';
+	is @parsed.elems, 4, '4 elems';
+	#is @parsed[0][0], 'start_elem', 'start_elem';
+	#is @parsed[0][1], 'chapter', 'chapter start';
+	#is @parsed[1][0], 'end_elem', 'end_elem';
+	#is @parsed[1][1], 'chapter', 'chapter end';
+}
+
+#----------------
+
+{
+	reset_all();
+	my $exception;
+
+	my $str = '<chapter><page></chapter>';
+	{
+		$xml.parse($str);
+		CATCH {
+			$exception = $_;
+		}
+	}
+	is $exception, "End element 'chapter' reached while in 'page' element", $str;
+}
+
+#----------------
+
+{
+	reset_all();
+	my $exception;
+
+	my $str = '<chapter><page></page></page></chapter>';
+
+	{
+		$xml.parse($str);
+		CATCH {
+			$exception = $_;
+		}
+	}
+	is $exception, "End element 'page' reached while in 'chapter' element", $str;
+}
+
+
+#----------------
+
+{
+	reset_all();
+	my $exception;
+
+	my $str = '<chapter id="12" name="perl"  ></chapter>';
 	$xml.parse($str);
-	CATCH {
-		$exception = $_;
-	}
-}
-is $exception, "End element 'chapter' reached while in 'page' element", $str;
-
-#----------------
-
-@parsed = ();
-$exception = '';
-$xml.reset;
-$str = '<chapter><page></page></page></chapter>';
-{
-	$xml.parse($str);
-	CATCH {
-		$exception = $_;
-	}
-}
-is $exception, "End element 'page' reached while in 'chapter' element", $str;
-
-
-#----------------
-
-@parsed = ();
-$exception = '';
-$xml.reset;
-$str = '<chapter id="12" name="perl"  ></chapter>';
-$xml.parse($str);
-$xml.done;
-is $xml.string, '', 'string is empty';
-is $xml.stack.elems, 0, 'stack is empty';
-is @parsed.elems, 2, '2 elems';
-is @parsed[0][0], 'start_elem', 'start_elem';
-is @parsed[0][1], 'chapter', 'chapter start';
-is @parsed[1][0], 'end_elem', 'end_elem';
-is @parsed[1][1], 'chapter', 'chapter end';
-{
+	$xml.done;
+	is $xml.string, '', 'string is empty';
+	is $xml.stack.elems, 0, 'stack is empty';
+	is @parsed.elems, 2, '2 elems';
+	is @parsed[0][0], 'start_elem', 'start_elem';
+	is @parsed[0][1], 'chapter', 'chapter start';
+	is @parsed[1][0], 'end_elem', 'end_elem';
+	is @parsed[1][1], 'chapter', 'chapter end';
 	my $attr = @parsed[0][1].attributes;
 	is $attr.elems, 2, "2 attributes";
 	is $attr[0].name, 'id', 'name is id';
@@ -156,3 +164,7 @@ is @parsed[1][1], 'chapter', 'chapter end';
 #   parse data given in a file
 
 
+sub reset_all() {
+	@parsed = ();
+	$xml.reset;
+}
