@@ -1,6 +1,7 @@
 class XML::SAX;
 
 use XML::SAX::Element;
+use XML::SAX::Attribute;
 
 has $.string = '';
 has @.stack;
@@ -24,7 +25,17 @@ method parse($str) {
 		$!string .= substr($/.to);
 		
 		if $/<opening> {
-			my $element = XML::SAX::Element.new(name => $/<opening><element>);
+			#my @attributes;
+			#note $/<opening><attr>;
+			my @attributes = map( {
+				XML::SAX::Attribute.new(
+					name => $_<name>,
+					value => $_<value>,
+				) }, $/<opening><attr>);
+			my $element = XML::SAX::Element.new(
+					name => $/<opening><element>,
+					attributes => @attributes,
+				);
 			@!stack.push($element);
 			self.start_elem($element);
 		} elsif $/<closing> {

@@ -5,7 +5,7 @@ BEGIN {
 	@*INC.push('lib');
 }
 
-plan 10+8+6+3;
+plan 10+8+6+12;
 
 use XML::SAX;
 ok 1, 'ok';
@@ -134,12 +134,18 @@ $xml.done;
 is $xml.string, '', 'string is empty';
 is $xml.stack.elems, 0, 'stack is empty';
 is @parsed.elems, 2, '2 elems';
-
-#is @parsed[0][0], 'start_elem', 'start_elem';
-#is @parsed[0][1], 'chapter', 'chapter start';
-#is @parsed[1][0], 'end_elem', 'end_elem';
-#is @parsed[1][1], 'chapter', 'chapter end';
-
+is @parsed[0][0], 'start_elem', 'start_elem';
+is @parsed[0][1], 'chapter', 'chapter start';
+is @parsed[1][0], 'end_elem', 'end_elem';
+is @parsed[1][1], 'chapter', 'chapter end';
+{
+	my $attr = @parsed[0][1].attributes;
+	is $attr.elems, 2, "2 attributes";
+	is $attr[0].name, 'id', 'name is id';
+	is $attr[0].value, '12', 'value is 12';
+	is $attr[1].name, 'name', 'name is name';
+	is $attr[1].value, 'perl', 'value is perl';
+}
 
 #----------------
 
