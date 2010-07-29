@@ -25,7 +25,7 @@ method parse_file($filename) {
 method parse($str) {
 	$!string ~= $str;
 
-	while $!string ~~ m/^ [ <opening=&opening> || <closing=&closing> || <text=&text> ] / {
+	while $!string ~~ m/^ [ \s* <opening=&opening> || <closing=&closing> || <text=&text> ] / {
 		#note $!string;
 		#note $/;
 		$!string .= substr($/.to);
