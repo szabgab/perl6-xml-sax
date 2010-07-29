@@ -135,7 +135,13 @@ is $xml.string, '', 'string is empty';
 is $xml.stack.elems, 0, 'stack is empty';
 is @parsed.elems, 2, '2 elems';
 
+#is @parsed[0][0], 'start_elem', 'start_elem';
+#is @parsed[0][1], 'chapter', 'chapter start';
+#is @parsed[1][0], 'end_elem', 'end_elem';
+#is @parsed[1][1], 'chapter', 'chapter end';
 
+
+#----------------
 
 # note "Ex: $exception";
 # TODO: 

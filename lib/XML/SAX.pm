@@ -1,5 +1,7 @@
 class XML::SAX;
 
+use XML::SAX::Element;
+
 has $.string = '';
 has @.stack;
 
@@ -22,8 +24,9 @@ method parse($str) {
 		$!string .= substr($/.to);
 		
 		if $/<opening> {
-			@!stack.push($/<opening><element>);
-			self.start_elem($/<opening><element>);
+			my $element = XML::SAX::Element.new(name => $/<opening><element>);
+			@!stack.push($element);
+			self.start_elem($element);
 		} elsif $/<closing> {
 			if not @!stack {
 				die "End element '$/<closing><element>' reached while stack was empty";
@@ -32,7 +35,7 @@ method parse($str) {
 			if $last ne $/<closing><element> {
 				die "End element '$/<closing><element>' reached while in '$last' element";
 			}
-			self.end_elem($/<closing><element>);
+			self.end_elem($last);
 		} else {
 			die "Invalid"
 		}
