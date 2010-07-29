@@ -5,7 +5,7 @@ BEGIN {
 	@*INC.push('lib');
 }
 
-plan 10+8+6;
+plan 10+8+6+3;
 
 use XML::SAX;
 ok 1, 'ok';
@@ -122,11 +122,25 @@ $str = '<chapter><page></page></page></chapter>';
 }
 is $exception, "End element 'page' reached while in 'chapter' element", $str;
 
-# note "Ex: $exception";
 
+#----------------
+
+@parsed = ();
+$exception = '';
+$xml.reset;
+$str = '<chapter id="12" name="perl"  ></chapter>';
+$xml.parse($str);
+$xml.done;
+is $xml.string, '', 'string is empty';
+is $xml.stack.elems, 0, 'stack is empty';
+is @parsed.elems, 2, '2 elems';
+
+
+
+# note "Ex: $exception";
 # TODO: 
 #   call process on data items
-#   include attributes in start_elem <chapter id="12" name="perl"  >
+#   include attributes in start_elem 
 #   parse data given in a file
 
 

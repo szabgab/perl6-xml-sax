@@ -3,16 +3,24 @@ class XML::SAX;
 has $.string = '';
 has @.stack;
 
-my token element { \w+ };
-my regex opening { \< <element=&element> \> }
+my token element { \w+ }
+my token name    { \w+ }
+my regex value   { <-[\"]>* }
+#my rule opening { \< <element=&element> \> }
+my rule attr { [<name=&name>\=\"<value=&value>\"] }
+
+my rule opening { \< <element=&element> <attr=&attr>* \> }
 my regex closing { \<\/ <element=&element> \> }
 
 # TODO Rakudofix: replace <opening=&opening> by <opening>
 method parse($str) {
 	$!string ~= $str;
 
-	while $!string ~~ m/^ <opening=&opening> || <closing=&closing> / {
+	while $!string ~~ m/^ [ <opening=&opening> || <closing=&closing> ] / {
+		#note $!string;
+		#note $/;
 		$!string .= substr($/.to);
+		
 		if $/<opening> {
 			@!stack.push($/<opening><element>);
 			self.start_elem($/<opening><element>);
