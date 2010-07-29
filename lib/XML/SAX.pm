@@ -10,9 +10,16 @@ my token element { \w+ }
 my token name    { \w+ }
 my token value   { <-[\"]>* }
 my rule attr { [<name=&name>\=\"<value=&value>\"] }
-my rule text { <-[\<]>+ }
+my rule text { <-[\<]>+ <?before \< > }
 my regex opening { \< <element=&element> <attr=&attr>* \> }
 my regex closing { \<\/ <element=&element> \> }
+
+method parse_file($filename) {
+	for lines $filename -> $line {
+		self.parse($line);
+	}
+	self.done;
+}
 
 # TODO Rakudofix: replace <opening=&opening> by <opening>
 method parse($str) {

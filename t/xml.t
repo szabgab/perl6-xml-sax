@@ -5,7 +5,7 @@ BEGIN {
 	@*INC.push('lib');
 }
 
-plan 10+8+6+12+20;
+plan 10+8+6+12+20+18;
 
 use XML::SAX;
 ok 1, 'ok';
@@ -197,6 +197,37 @@ is @parsed[1][1], 'chapter', 'chapter end';
 # note "Ex: $exception";
 # TODO: 
 #   parse data given in a file
+
+{
+	reset_all();
+	diag 't/files/a.xml';
+
+	XML::SAX::Test.new.parse_file('t/files/a.xml');
+	is @parsed.elems, 7, '7 elems';
+	is @parsed[0][0], 'start_elem', 'start_elem';
+	is @parsed[0][1], 'chapter', 'chapter start';
+
+	is @parsed[1][0], 'content', 'content';
+	is @parsed[1][1], 'chapter', ' text before';
+	is @parsed[1][1].content[0], ' before ', 'text before';
+
+	is @parsed[2][0], 'start_elem', 'start_elem';
+	is @parsed[2][1], 'para', 'para start';
+
+	is @parsed[3][0], 'content', 'content';
+	is @parsed[3][1], 'para', ' text inside';
+	is @parsed[3][1].content[0], 'this is the text', 'this is the text';
+
+	is @parsed[4][0], 'end_elem', 'end_elem';
+	is @parsed[4][1], 'para', 'para end';
+
+	is @parsed[5][0], 'content', 'content';
+	is @parsed[5][1], 'chapter', 'text after';
+	is @parsed[5][1].content[1], ' after ', 'text after';
+	
+	is @parsed[6][0], 'end_elem', 'end_elem';
+	is @parsed[6][1], 'chapter', 'chapter end';
+}
 
 
 sub reset_all() {
