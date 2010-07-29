@@ -40,18 +40,6 @@ method parse($str) {
 			die "Invalid"
 		}
 	}
-
-	# if $!string ~~ m/^ <closing=&closing> / {
-		# $!string .= substr($/.to);
-		# if not @!stack {
-			# die "End element '$/<closing><element>' reached while stack was empty";
-		# }
-		# my $last = @!stack.pop;
-		# if $last ne $/<closing><element> {
-			# die "End element '$/<closing><element>' reached while in '$last' element";
-		# }
-		# self.end_elem($/<closing><element>);
-	# }
 }
 
 method done() {
