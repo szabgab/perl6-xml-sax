@@ -1,7 +1,6 @@
 class XML::SAX;
 
 use XML::SAX::Element;
-#use XML::SAX::Attribute;
 
 has $.string = '';
 has @.stack;
