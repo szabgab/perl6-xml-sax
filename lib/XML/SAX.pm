@@ -100,3 +100,43 @@ method end_elem($elem) {
 method content($elem) {
 	...
 }
+
+=begin pod
+
+=head NAME
+
+XML::SAX - a SAX XML parser
+
+=head SYNOPSYS
+
+
+    use XML::SAX;
+    class My::XMLProcess is XML::SAX {
+        method start_elem($elem) {
+            # called with an XML::SAX::Element object when <elem> is reached
+        }
+        method end_elem($elem) {
+            # called with an XML::SAX::Element object when </elem> is reached
+        }
+        method content($elem) {
+            # called with an XML::SAX::Element object when some textual content is reached within an element
+        }
+    }
+
+    My::XMLProcess.new.parse_file('path/to/file.xml');
+
+
+    XML::SAX::Element object have the following members:
+
+    name     - the name of the element
+    content  - an array of the various pieces of content
+    attributes - currently and array of XML::SAX::Attribute objects
+
+
+=head AUTHOR
+
+Gabor Szabo <gabor@szabgab.com>
+
+=end pod
+
+
