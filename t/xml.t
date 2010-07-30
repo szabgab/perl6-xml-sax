@@ -5,7 +5,7 @@ BEGIN {
 	@*INC.push('lib');
 }
 
-plan 10+8+6+12+20+18+3+3;
+plan 10+8+6+12+20+18+3+3+14;
 
 use XML::SAX;
 ok 1, 'ok';
@@ -252,6 +252,36 @@ is @parsed[1][1], 'chapter', 'chapter end';
 	is $xml.stack.elems, 0, 'stack is empty';
 	is @parsed.elems, 6, '6 elems';
 }
+
+{
+	reset_all();
+	my $str = qq{<a><b id="23" /></a>};
+	diag $str;
+
+	$xml.parse($str);
+	$xml.done;
+	is $xml.string, '', 'string is empty';
+	is $xml.stack.elems, 0, 'stack is empty';
+	is @parsed.elems, 4, '4 elems';
+
+	is @parsed[0][0], 'start_elem', 'start_elem';
+	is @parsed[0][1], 'a', 'a start';
+
+	is @parsed[1][0], 'start_elem', 'start_elem';
+	is @parsed[1][1], 'b', 'b start';
+
+	is @parsed[2][0], 'end_elem', 'end_elem';
+	is @parsed[2][1], 'b', 'b end';
+
+	is @parsed[3][0], 'end_elem', 'end_elem';
+	is @parsed[3][1], 'a', 'a end';
+
+	my $attr = @parsed[1][1].attributes;
+	is $attr.elems, 1, "1 attributes";
+	is $attr[0].name, 'id', 'name is id';
+	is $attr[0].value, '23', 'value is 23';
+}
+
 
 sub reset_all() {
 	@parsed = ();
