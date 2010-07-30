@@ -2,7 +2,7 @@ class XML::SAX::Element;
 
 has $.name;
 has @.content is rw;
-has @.attributes;
+has %.attributes;
 
 method Str() {
 	$.name;

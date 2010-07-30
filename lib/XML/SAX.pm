@@ -1,7 +1,7 @@
 class XML::SAX;
 
 use XML::SAX::Element;
-use XML::SAX::Attribute;
+#use XML::SAX::Attribute;
 
 has $.string = '';
 has @.stack;
@@ -53,14 +53,14 @@ method parse($str) {
 
 # TODO should be submethod?
 method setup_start($match) {			
-	my @attributes = map( {
-		XML::SAX::Attribute.new(
-			name => $_<name>,
-			value => $_<value>,
-		) }, $match<attr>);
+	#say $match<attr>.perl;
+	#say $match<attr>.WHAT;
+	#say $match<attr>.elems;
+	# TODO Rakudo bug ? ~ needed for stringification on next line
+	my %attributes = $match<attr>.map( {; ~$_<name> => ~$_<value> } ); 
 	my $element = XML::SAX::Element.new(
 			name => $match<element>,
-			attributes => @attributes,
+			attributes => %attributes,
 		);
 	@!stack.push($element);
 	self.start_elem($element);
@@ -130,7 +130,9 @@ XML::SAX - a SAX XML parser
 
     name     - the name of the element
     content  - an array of the various pieces of content
-    attributes - currently and array of XML::SAX::Attribute objects
+    attributes - is a hash where the keys are the attrbute names and the values the attribute values
+	
+	$elem.attributes<id>
 
 
 =head AUTHOR
