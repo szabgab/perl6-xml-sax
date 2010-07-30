@@ -1,18 +1,10 @@
 class XML::SAX;
 
 use XML::SAX::Element;
+use XML::SAX::Grammar;
 
 has $.string = '';
 has @.stack;
-
-my token element { \w+ }
-my token name    { \w+ }
-my token value   { <-[\"]>* }
-my rule attr { [<name=&name>\=\"<value=&value>\"] }
-my rule text { <-[\<]>+ <?before \< > }
-my regex opening { \< <element=&element> <attr=&attr>* \> }
-my regex closing { \<\/ <element=&element> \> }
-my regex single { \< <element=&element> <attr=&attr>* \/\> }
 
 method parse_file($filename) {
 	for lines $filename -> $line {
@@ -25,7 +17,7 @@ method parse_file($filename) {
 method parse($str) {
 	$!string ~= $str;
 	
-	while $!string ~~ m/^ [ \s* <opening=&opening> || \s* <closing=&closing> || \s* <single=&single> || <text=&text> ] / {
+	while XML::SAX::Grammar.parse($!string) {
 		#note $!string;
 		#note $/;
 		$!string .= substr($/.to);
