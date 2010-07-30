@@ -98,7 +98,7 @@ method content($elem) {
 
 XML::SAX - a SAX XML parser
 
-=head SYNOPSYS
+=head SYNOPSIS
 
 
     use XML::SAX;

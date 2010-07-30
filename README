@@ -1,3 +1,7 @@
 A Naive implementation of a XML SAX processor.
 
 Please report bugs and feature requests.
+
+
+See SYNOPSIS in 
+http://github.com/szabgab/xml-sax/blob/master/lib/XML/SAX.pm 
