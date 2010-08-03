@@ -5,7 +5,7 @@ BEGIN {
 	@*INC.push('lib');
 }
 
-plan 10+8+6+10+20+18+3+3+13;
+plan 10+8+6+10+23+21+3+3+13;
 
 use XML::SAX;
 ok 1, 'ok';
@@ -163,9 +163,9 @@ is $xml.WHAT, 'XML::SAX::Test()', 'XML::SAX::Test constructor';
 
 {
 	reset_all();
-	diag 'content';
 
 	my $str = '<chapter> before <para>this is the text</para> after </chapter>';
+	diag $str;
 	$xml.parse($str);
 	$xml.done;
 	is $xml.string, '', 'string is empty';
@@ -190,7 +190,10 @@ is $xml.WHAT, 'XML::SAX::Test()', 'XML::SAX::Test constructor';
 
 	is @parsed[5][0], 'content', 'content';
 	is @parsed[5][1], 'chapter', 'text after';
-	is @parsed[5][1].content[1], ' after ', 'text after';
+	is @parsed[5][1].content[0], ' before ', 'before para element';
+	is @parsed[5][1].content[1], 'para', 'para element';
+	is @parsed[5][1].content[1].get_content, 'this is the text', 'content of para element';
+	is @parsed[5][1].content[2], ' after ', 'text after';
 	
 	is @parsed[6][0], 'end_elem', 'end_elem';
 	is @parsed[6][1], 'chapter', 'chapter end';
@@ -225,7 +228,10 @@ is $xml.WHAT, 'XML::SAX::Test()', 'XML::SAX::Test constructor';
 
 	is @parsed[5][0], 'content', 'content';
 	is @parsed[5][1], 'chapter', 'text after';
-	is @parsed[5][1].content[1], ' after ', 'text after';
+	is @parsed[5][1].content[0], ' before ', 'before para element';
+	is @parsed[5][1].content[1], 'para', 'para element';
+	is @parsed[5][1].content[1].get_content, 'this is the text', 'content of para element';
+	is @parsed[5][1].content[2], ' after ', 'text after';
 	
 	is @parsed[6][0], 'end_elem', 'end_elem';
 	is @parsed[6][1], 'chapter', 'chapter end';

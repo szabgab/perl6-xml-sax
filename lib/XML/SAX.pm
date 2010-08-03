@@ -34,6 +34,7 @@ method parse($str) {
 				die "Text seen outside of all elements";
 			}
 			#note $/<text>;
+			die $/<text> if @!stack[*-1] eq '';
 			@!stack[*-1].content.push($/<text>);
 			self.content(@!stack[*-1]);
 		} else {
@@ -66,6 +67,10 @@ method setup_end($match) {
 		die "End element '$match<element>' reached while in '$last' element";
 	}
 	self.end_elem($last);
+	if @!stack {
+		die @!stack[*-1].perl if @!stack[*-1] eq '';
+		@!stack[*-1].content.push($last);
+	}
 }
 
 method done() {
