@@ -9,7 +9,8 @@ method Str() {
 }
 
 method get_content {
-	die "No content" if not @.content;
+	return '' if not @.content;
+	#die "No content" if not @.content;
 	return @.content[0] if  @.content.elems == 1;
 	my $str = '';
 	for @.content -> $c {

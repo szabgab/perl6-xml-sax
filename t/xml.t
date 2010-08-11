@@ -5,7 +5,7 @@ BEGIN {
 	@*INC.push('lib');
 }
 
-plan 10+8+6+10+23+21+3+3+13;
+plan 10+8+6+10+23+21+3+3+13+11;
 
 use XML::SAX;
 ok 1, 'ok';
@@ -287,6 +287,31 @@ is $xml.WHAT, 'XML::SAX::Test()', 'XML::SAX::Test constructor';
 	my $attr = @parsed[1][1].attributes;
 	is $attr.elems, 1, "1 attributes";
 	is $attr<id>, 23, 'id=23';
+}
+
+{
+	reset_all();
+	my $str = qq{<a> apple <!-- <b id="23" /> --> banana </a>};
+	diag $str;
+
+	$xml.parse($str);
+	$xml.done;
+	is $xml.string, '', 'string is empty';
+
+	is @parsed[0][0], 'start_elem', 'start_elem';
+	is @parsed[0][1], 'a', 'a start';
+
+	is @parsed[1][0], 'content', 'content';
+	is @parsed[1][1], 'a', 'a';
+	is @parsed[1][1].content[0], ' apple ', 'apple';
+	#note @parsed[1].perl;
+
+	is @parsed[2][0], 'content', 'content';
+	is @parsed[2][1], 'a', 'a';
+	is @parsed[2][1].content[1], ' banana ', 'banana';
+
+	is @parsed[3][0], 'end_elem', 'end_elem';
+	is @parsed[3][1], 'a', 'a end';
 }
 
 

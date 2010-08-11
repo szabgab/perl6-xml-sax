@@ -37,8 +37,10 @@ method parse($str) {
 			die $/<text> if @!stack[*-1] eq '';
 			@!stack[*-1].content.push($/<text>);
 			self.content(@!stack[*-1]);
+		} elsif $/<comment> {
+			# do nothing;
 		} else {
-			die "Invalid"
+			die "Invalid code. Something is not implemented in XML::SAX"
 		}
 	}
 }
