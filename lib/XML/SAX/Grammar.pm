@@ -1,16 +1,15 @@
 grammar XML::SAX::Grammar;
 
-# TODO Rakudofix: replace <opening=&opening> by <opening>
-regex TOP { ^ [ \s* <opening=&opening> || \s* <closing=&closing> || \s* <single=&single> || <text=&text> 
+regex TOP { ^ [ \s* <opening> || \s* <closing> || \s* <single> || <text> 
 	|| \s* <comment> ] }
 
-my token element { \w+ }
-my token name    { \w+ }
-my token value   { <-[\"]>* }
-my rule attr { [<name=&name>\=\"<value=&value>\"] }
-my rule text { <-[\<]>+ <?before \< > }
-my regex opening { \< <element=&element> <attr=&attr>* \> }
-my regex closing { \<\/ <element=&element> \> }
-my regex single { \< <element=&element> <attr=&attr>* \/\> }
+token element { \w+ }
+token name    { \w+ }
+token value   { <-[\"]>* }
+rule  attr    { [<name>\=\"<value>\"] }
+rule  text    { <-[\<]>+ <?before \< > }
+regex opening { \< <element> <attr>* \> }
+regex closing { \<\/ <element> \> }
+regex single  { \< <element> <attr>* \/\> }
 
 regex comment { \<\!\-\- .*? \-\-\> }
