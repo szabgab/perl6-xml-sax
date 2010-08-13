@@ -1,5 +1,6 @@
 grammar XML::SAX::Grammar;
 
+# TODO Rakudofix: replace <opening=&opening> by <opening>
 regex TOP { ^ [ \s* <opening=&opening> || \s* <closing=&closing> || \s* <single=&single> || <text=&text> 
 	|| \s* <comment> ] }
 
