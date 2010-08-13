@@ -15,6 +15,10 @@ method parse_file($filename) {
 
 # TODO Rakudofix: replace <opening=&opening> by <opening>
 method parse($str) {
+	# insert a space if not tag boundary
+	if $!string.chars and $str.chars and substr($!string, -1) ne '>' and substr($str, 0, 1) ne '<' {
+		$!string ~= ' ';
+	}
 	$!string ~= $str;
 	
 	while XML::SAX::Grammar.parse($!string) {
@@ -77,7 +81,7 @@ method setup_end($match) {
 
 method done() {
 	return 1 if $!string eq '' and not @!stack;
-	die "Left over string: '$!string'" if $!string;
+	die "Left over string: '$!string'" if $!string and $!string ~~ /\S/;
 	die "Still in stack: { @!stack }" if @!stack;
 }
 

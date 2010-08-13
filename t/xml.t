@@ -205,40 +205,6 @@ is $xml.WHAT, 'XML::SAX::Test()', 'XML::SAX::Test constructor';
 
 {
 	reset_all();
-	diag 't/files/a.xml';
-
-	XML::SAX::Test.new.parse_file('t/files/a.xml');
-	is @parsed.elems, 7, '7 elems';
-	is @parsed[0][0], 'start_elem', 'start_elem';
-	is @parsed[0][1], 'chapter', 'chapter start';
-
-	is @parsed[1][0], 'content', 'content';
-	is @parsed[1][1], 'chapter', ' text before';
-	is @parsed[1][1].content[0], ' before ', 'text before';
-
-	is @parsed[2][0], 'start_elem', 'start_elem';
-	is @parsed[2][1], 'para', 'para start';
- 
-	is @parsed[3][0], 'content', 'content';
-	is @parsed[3][1], 'para', ' text inside';
-	is @parsed[3][1].content[0], 'this is the text', 'this is the text';
-
-	is @parsed[4][0], 'end_elem', 'end_elem';
-	is @parsed[4][1], 'para', 'para end';
-
-	is @parsed[5][0], 'content', 'content';
-	is @parsed[5][1], 'chapter', 'text after';
-	is @parsed[5][1].content[0], ' before ', 'before para element';
-	is @parsed[5][1].content[1], 'para', 'para element';
-	is @parsed[5][1].content[1].get_content, 'this is the text', 'content of para element';
-	is @parsed[5][1].content[2], ' after ', 'text after';
-	
-	is @parsed[6][0], 'end_elem', 'end_elem';
-	is @parsed[6][1], 'chapter', 'chapter end';
-}
-
-{
-	reset_all();
 	my $str = "<a>\n <b></b></a>";
 	diag $str;
 
@@ -312,6 +278,40 @@ is $xml.WHAT, 'XML::SAX::Test()', 'XML::SAX::Test constructor';
 
 	is @parsed[3][0], 'end_elem', 'end_elem';
 	is @parsed[3][1], 'a', 'a end';
+}
+
+{
+	reset_all();
+	diag 't/files/a.xml';
+
+	XML::SAX::Test.new.parse_file('t/files/a.xml');
+	is @parsed.elems, 7, '7 elems';
+	is @parsed[0][0], 'start_elem', 'start_elem';
+	is @parsed[0][1], 'chapter', 'chapter start';
+
+	is @parsed[1][0], 'content', 'content';
+	is @parsed[1][1], 'chapter', ' text before';
+	is @parsed[1][1].content[0], ' before ', 'text before';
+
+	is @parsed[2][0], 'start_elem', 'start_elem';
+	is @parsed[2][1], 'para', 'para start';
+ 
+	is @parsed[3][0], 'content', 'content';
+	is @parsed[3][1], 'para', ' text inside';
+	is @parsed[3][1].content[0], 'this is the text', 'this is the text';
+
+	is @parsed[4][0], 'end_elem', 'end_elem';
+	is @parsed[4][1], 'para', 'para end';
+
+	is @parsed[5][0], 'content', 'content';
+	is @parsed[5][1], 'chapter', 'text after';
+	is @parsed[5][1].content[0], ' before ', 'before para element';
+	is @parsed[5][1].content[1], 'para', 'para element';
+	is @parsed[5][1].content[1].get_content, 'this is the text', 'content of para element';
+	is @parsed[5][1].content[2], ' after  ', 'text after';
+	
+	is @parsed[6][0], 'end_elem', 'end_elem';
+	is @parsed[6][1], 'chapter', 'chapter end';
 }
 
 
