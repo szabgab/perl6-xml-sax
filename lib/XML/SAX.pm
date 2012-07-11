@@ -6,12 +6,13 @@ use XML::SAX::Grammar;
 has $.string = '';
 has @.stack;
 
+
 method parse_file($filename) {
-	# TODO Rakudofix 
+	# TODO Rakudofix
 	# read the file with newlines so we can deal with cases when the newlines are need to be kept
 	# eg. "literallayout" in docbook
 	# open should have a flag for no-chomp
-	for lines $filename -> $line {
+	for $filename.IO.lines -> $line {
 		self.parse("$line\n");
 	}
 	self.done;
@@ -19,16 +20,16 @@ method parse_file($filename) {
 
 method parse($str) {
 	# insert a space if not tag boundary
-	if $!string.chars and $str.chars and substr($!string, -1) ne '>' and substr($str, 0, 1) ne '<' {
+	if $!string.chars and $str.chars and substr($!string, *-1) ne '>' and substr($str, 0, 1) ne '<' {
 		$!string ~= ' ';
 	}
 	$!string ~= $str;
-	
+
 	while XML::SAX::Grammar.parse($!string) {
 		#note $!string;
 		#note $/;
 		$!string .= substr($/.to);
-		
+
 		if $/<opening> {
 			self.setup_start($/<opening>);
 		} elsif $/<closing> {
@@ -53,12 +54,12 @@ method parse($str) {
 }
 
 # TODO should be submethod?
-method setup_start($match) {			
+method setup_start($match) {
 	#say $match<attr>.perl;
 	#say $match<attr>.WHAT;
 	#say $match<attr>.elems;
 	# TODO Rakudo bug ? ~ needed for stringification on next line
-	my %attributes = $match<attr>.map( {; ~$_<name> => ~$_<value> } ); 
+	my %attributes = $match<attr>.map( {; ~$_<name> => ~$_<value> } );
 	my $element = XML::SAX::Element.new(
 			name => $match<element>,
 			attributes => %attributes,
@@ -85,7 +86,7 @@ method setup_end($match) {
 method done() {
 	return 1 if $!string eq '' and not @!stack;
 	die "Left over string: '$!string'" if $!string and $!string ~~ /\S/;
-	die "Still in stack: { @!stack }" if @!stack;
+	die "Still in stack: { @!stack.map({$_.Str}).join(' ') }" if @!stack;
 }
 
 method reset() {
@@ -105,6 +106,7 @@ method end_elem($elem) {
 method content($elem) {
 	...
 }
+
 
 =begin pod
 
@@ -136,7 +138,7 @@ XML::SAX - a SAX XML parser
     name     - the name of the element
     content  - an array of the various pieces of content
     attributes - is a hash where the keys are the attrbute names and the values the attribute values
-	
+
 	$elem.attributes<id>
 
 

@@ -1,9 +1,6 @@
 use v6;
 
 use Test;
-BEGIN { 
-	@*INC.push('lib');
-}
 
 plan 10+8+6+10+23+21+3+3+13+11;
 
@@ -25,15 +22,16 @@ class XML::SAX::Test is XML::SAX {
 
 {
 	my $xml = XML::SAX.new;
-	is $xml.WHAT, 'XML::SAX()', 'XML::SAX constructor';
+	isa_ok $xml, 'XML::SAX';
 }
 
 my $xml = XML::SAX::Test.new;
-is $xml.WHAT, 'XML::SAX::Test()', 'XML::SAX::Test constructor';
+isa_ok $xml, 'XML::SAX::Test', 'XML::SAX::Test constructor';
 
 #----------------
 
 {
+	reset_all();
 	$xml.parse('<chapter>');
 	is @parsed.elems, 1, 'one element';
 	is @parsed[0][0], 'start_elem', 'start_elem';
@@ -41,17 +39,19 @@ is $xml.WHAT, 'XML::SAX::Test()', 'XML::SAX::Test constructor';
 	#ok @parsed ~~ ['chapter'], 'parsed chapter';
 	#note @parsed.perl;
 	#note ;
-	
+
 	{
 		$xml.done;
 		CATCH {
-			is $_, 'Still in stack: chapter', 'exception still in stack';
+			default {
+				is $_, 'Still in stack: chapter', 'exception still in stack';
+			}
 		}
 	}
-	
+
 	is $xml.string, '', 'string is empty';
 	is $xml.stack[0], 'chapter', 'stack is chapter';
-	
+
 	$xml.reset;
 	is $xml.string, '', 'string is empty';
 	is $xml.stack.elems, 0, 'stack is empty';
@@ -82,7 +82,9 @@ is $xml.WHAT, 'XML::SAX::Test()', 'XML::SAX::Test constructor';
 	{
 		$xml.parse('</chapter>');
 		CATCH {
-			$exception = $_;
+			default {
+				$exception = $_;
+			}
 		}
 	}
 	is $exception, "End element 'chapter' reached while stack was empty", 'exception on single </chapter>';
@@ -114,7 +116,9 @@ is $xml.WHAT, 'XML::SAX::Test()', 'XML::SAX::Test constructor';
 	{
 		$xml.parse($str);
 		CATCH {
-			$exception = $_;
+			default {
+				$exception = $_;
+			}
 		}
 	}
 	is $exception, "End element 'chapter' reached while in 'page' element", $str;
@@ -131,7 +135,9 @@ is $xml.WHAT, 'XML::SAX::Test()', 'XML::SAX::Test constructor';
 	{
 		$xml.parse($str);
 		CATCH {
-			$exception = $_;
+			default {
+				$exception = $_;
+			}
 		}
 	}
 	is $exception, "End element 'page' reached while in 'chapter' element", $str;
@@ -194,13 +200,13 @@ is $xml.WHAT, 'XML::SAX::Test()', 'XML::SAX::Test constructor';
 	is @parsed[5][1].content[1], 'para', 'para element';
 	is @parsed[5][1].content[1].get_content, 'this is the text', 'content of para element';
 	is @parsed[5][1].content[2], ' after ', 'text after';
-	
+
 	is @parsed[6][0], 'end_elem', 'end_elem';
 	is @parsed[6][1], 'chapter', 'chapter end';
 }
 
 # note "Ex: $exception";
-# TODO: 
+# TODO:
 #   parse data given in a file
 
 {
@@ -295,7 +301,7 @@ is $xml.WHAT, 'XML::SAX::Test()', 'XML::SAX::Test constructor';
 
 	is @parsed[2][0], 'start_elem', 'start_elem';
 	is @parsed[2][1], 'para', 'para start';
- 
+
 	is @parsed[3][0], 'content', 'content';
 	is @parsed[3][1], 'para', ' text inside';
 	is @parsed[3][1].content[0], "this is the text\n", 'this is the text';
@@ -309,7 +315,7 @@ is $xml.WHAT, 'XML::SAX::Test()', 'XML::SAX::Test constructor';
 	is @parsed[5][1].content[1], 'para', 'para element';
 	is @parsed[5][1].content[1].get_content, "this is the text\n", 'content of para element';
 	is @parsed[5][1].content[2], "\n  after\n  ", 'text after';
-	
+
 	is @parsed[6][0], 'end_elem', 'end_elem';
 	is @parsed[6][1], 'chapter', 'chapter end';
 }
@@ -319,3 +325,4 @@ sub reset_all() {
 	@parsed = ();
 	$xml.reset;
 }
+

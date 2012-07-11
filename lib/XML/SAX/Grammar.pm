@@ -1,6 +1,6 @@
 grammar XML::SAX::Grammar;
 
-regex TOP { ^ [ \s* <opening> || \s* <closing> || \s* <single> || <text> 
+regex TOP { ^ [ \s* <opening> || \s* <closing> || \s* <single> || <text>
 	|| \s* <comment> ] }
 
 token element { \w+ }
