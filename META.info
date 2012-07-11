@@ -1,0 +1,7 @@
+{
+    "name"        : "XML::SAX",
+    "version"     : "*",
+    "description" : "Naive XML parser for Perl 6",
+    "depends"     : [],
+    "source-url"  : "git://github.com/szabgab/perl6-xml-sax.git"
+}
