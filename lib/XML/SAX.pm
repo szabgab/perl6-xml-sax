@@ -148,4 +148,5 @@ Gabor Szabo <gabor@szabgab.com>
 
 =end pod
 
+# vim: ft=perl6
 

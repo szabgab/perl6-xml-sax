@@ -14,9 +14,12 @@ method get_content {
 	return @.content[0] if  @.content.elems == 1;
 	my $str = '';
 	for @.content -> $c {
-		$str ~= $c.get_content;
+		if $c.can('get_content') {
+			$str ~= $c.get_content;
+		}
 	}
 	return $str;
 }
 
+# vim: ft=perl6
 
