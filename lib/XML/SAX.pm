@@ -6,19 +6,28 @@ use XML::SAX::Grammar;
 has $.string = '';
 has @.stack;
 
+has $!file;
+
 
 method parse_file($filename) {
+	$!file = $filename;
 	# TODO Rakudofix
 	# read the file with newlines so we can deal with cases when the newlines are need to be kept
 	# eg. "literallayout" in docbook
 	# open should have a flag for no-chomp
 	for $filename.IO.lines -> $line {
-		self.parse("$line\n");
+		self.parse_str("$line\n");
 	}
 	self.done;
 }
 
 method parse($str) {
+	$!file = '';
+	self.parse_str($str);
+}
+
+
+method parse_str($str) {
 	# insert a space if not tag boundary
 	if $!string.chars and $str.chars and substr($!string, *-1) ne '>' and substr($str, 0, 1) ne '<' {
 		$!string ~= ' ';
