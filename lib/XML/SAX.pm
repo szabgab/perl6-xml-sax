@@ -6,11 +6,11 @@ use XML::SAX::Grammar;
 has $.string = '';
 has @.stack;
 
-has $!file;
+has $.file is rw;
 
 
 method parse_file($filename) {
-	$!file = $filename;
+	$.file = $filename;
 	# TODO Rakudofix
 	# read the file with newlines so we can deal with cases when the newlines are need to be kept
 	# eg. "literallayout" in docbook
@@ -22,7 +22,7 @@ method parse_file($filename) {
 }
 
 method parse($str) {
-	$!file = '';
+	$.file = '';
 	self.parse_str($str);
 }
 
