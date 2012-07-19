@@ -304,36 +304,33 @@ isa_ok $xml, 'XML::SAX::Test', 'XML::SAX::Test constructor';
 }
 
 {
-	BEGIN { $test += 28 }
+	BEGIN { $test += 21 }
 	reset_all();
 	diag 't/files/a.xml';
 
 	XML::SAX::Test.new.parse_file('t/files/a.xml');
 	my @expected = (
-		['start_elem', 'chapter'],
-		['content',    'chapter'],
-		['start_elem', 'para'],
-		['content',    'para'],
-		['end_elem',   'para'],
-		['content',    'chapter'],
-		['end_elem',   'chapter'],
+		['start_elem', 'chapter'                     ],
+		['content',    'chapter', " before \n"       ],
+		['start_elem', 'para'                        ],
+		['content',    'para',   "this is the text\n"],
+		['end_elem',   'para'                        ],
+		['content',    'chapter', " before \n", 'para', "\n  after\n  "],
+		['end_elem',   'chapter'                     ],
 	);
 
 	is @parsed.elems, @expected.elems;
 
 	for 0 .. @expected.elems-1 -> $i {
-		is @parsed[$i].elems, @expected[$i].elems;
-		for 0 .. @expected[$i].elems-1 -> $j {
-			is @parsed[$i][$j], @expected[$i][$j];
+		is @parsed[$i][0], @expected[$i][0], "event: {@expected[$i][0]}";
+		is @parsed[$i][1], @expected[$i][1], "type:  {@expected[$i][1]}";
+		#is @parsed[$i][1].content.elems, @expected[$i].elems -2, 'content count';
+		for 2 .. @expected[$i].elems-1 -> $j {
+			is @parsed[$i][1].content[$j-2], @expected[$i][$j];
 		}
 	}
 
-	is @parsed[1][1].content[0], " before \n", 'text before';
-	is @parsed[3][1].content[0], "this is the text\n", 'this is the text';
-	is @parsed[5][1].content[0], " before \n", 'before para element';
-	is @parsed[5][1].content[1], 'para', 'para element';
 	is @parsed[5][1].content[1].get_content, "this is the text\n", 'content of para element';
-	is @parsed[5][1].content[2], "\n  after\n  ", 'text after';
 
 }
 
