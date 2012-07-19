@@ -2,7 +2,7 @@ use v6;
 
 use Test;
 
-plan 10+8+6+10+23+21+3+3+13+11;
+plan 10+8+6+10+23+21+3+3+13+11+7;
 
 use XML::SAX;
 ok 1, 'ok';
@@ -291,33 +291,32 @@ isa_ok $xml, 'XML::SAX::Test', 'XML::SAX::Test constructor';
 	diag 't/files/a.xml';
 
 	XML::SAX::Test.new.parse_file('t/files/a.xml');
-	is @parsed.elems, 7, '7 elems';
-	is @parsed[0][0], 'start_elem', 'start_elem';
-	is @parsed[0][1], 'chapter', 'chapter start';
+	my @expected = (
+		['start_elem', 'chapter'],
+		['content',    'chapter'],
+		['start_elem', 'para'],
+		['content',    'para'],
+		['end_elem',   'para'],
+		['content',    'chapter'],
+		['end_elem',   'chapter'],
+	);
 
-	is @parsed[1][0], 'content', 'content';
-	is @parsed[1][1], 'chapter', ' text before';
+	is @parsed.elems, @expected.elems;
+
+	for 0 .. @expected.elems-1 -> $i {
+		is @parsed[$i].elems, @expected[$i].elems;
+		for 0 .. @expected[$i].elems-1 -> $j {
+			is @parsed[$i][$j], @expected[$i][$j];
+		}
+	}
+
 	is @parsed[1][1].content[0], " before \n", 'text before';
-
-	is @parsed[2][0], 'start_elem', 'start_elem';
-	is @parsed[2][1], 'para', 'para start';
-
-	is @parsed[3][0], 'content', 'content';
-	is @parsed[3][1], 'para', ' text inside';
 	is @parsed[3][1].content[0], "this is the text\n", 'this is the text';
-
-	is @parsed[4][0], 'end_elem', 'end_elem';
-	is @parsed[4][1], 'para', 'para end';
-
-	is @parsed[5][0], 'content', 'content';
-	is @parsed[5][1], 'chapter', 'text after';
 	is @parsed[5][1].content[0], " before \n", 'before para element';
 	is @parsed[5][1].content[1], 'para', 'para element';
 	is @parsed[5][1].content[1].get_content, "this is the text\n", 'content of para element';
 	is @parsed[5][1].content[2], "\n  after\n  ", 'text after';
 
-	is @parsed[6][0], 'end_elem', 'end_elem';
-	is @parsed[6][1], 'chapter', 'chapter end';
 }
 
 
@@ -325,4 +324,4 @@ sub reset_all() {
 	@parsed = ();
 	$xml.reset;
 }
-
+# <a href="http://url">link</a> after-link
