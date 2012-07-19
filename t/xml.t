@@ -319,20 +319,24 @@ isa_ok $xml, 'XML::SAX::Test', 'XML::SAX::Test constructor';
 		['end_elem',   'chapter'                     ],
 	);
 
-	is @parsed.elems, @expected.elems;
-
-	for 0 .. @expected.elems-1 -> $i {
-		is @parsed[$i][0], @expected[$i][0], "event: {@expected[$i][0]}";
-		is @parsed[$i][1], @expected[$i][1], "type:  {@expected[$i][1]}";
-		#is @parsed[$i][1].content.elems, @expected[$i].elems -2, 'content count';
-		for 2 .. @expected[$i].elems-1 -> $j {
-			is @parsed[$i][1].content[$j-2], @expected[$i][$j];
-		}
-	}
+	cmp_deep(@parsed, @expected);
 
 	is @parsed[5][1].content[1].get_content, "this is the text\n", 'content of para element';
-
 }
+
+sub cmp_deep(@real, @expected) {
+
+	is @real.elems, @expected.elems;
+
+	for 0 .. @expected.elems-1 -> $i {
+		is @real[$i][0], @expected[$i][0], "event: {@expected[$i][0]}";
+		is @real[$i][1], @expected[$i][1], "type:  {@expected[$i][1]}";
+		for 2 .. @expected[$i].elems-1 -> $j {
+			is @real[$i][1].content[$j-2], @expected[$i][$j];
+		}
+	}
+}
+
 
 
 sub reset_all() {
