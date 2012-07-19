@@ -66,7 +66,7 @@ isa_ok $xml, 'XML::SAX::Test', 'XML::SAX::Test constructor';
 #----------------
 
 {
-	BEGIN { $test += 7 }
+	BEGIN { $test += 3 }
 	#@parsed = ();
 	reset_all();
 	$xml.parse('<chapter>');
@@ -74,11 +74,11 @@ isa_ok $xml, 'XML::SAX::Test', 'XML::SAX::Test constructor';
 	$xml.done;
 	is $xml.string, '', 'string is empty';
 	is $xml.stack.elems, 0, 'stack is empty';
-	is @parsed.elems, 2, '2 elems';
-	is @parsed[0][0], 'start_elem', 'start_elem';
-	is @parsed[0][1], 'chapter', 'chapter start';
-	is @parsed[1][0], 'end_elem', 'end_elem';
-	is @parsed[1][1], 'chapter', 'chapter end';
+	my @expected = (
+		['start_elem', 'chapter'],
+		['end_elem', 'chapter'],
+	);
+	cmp_deep(@parsed, @expected, "<chapter></chapter>");
 }
 
 #----------------
@@ -158,7 +158,7 @@ isa_ok $xml, 'XML::SAX::Test', 'XML::SAX::Test constructor';
 #----------------
 
 {
-	BEGIN { $test += 10 }
+	BEGIN { $test += 6 }
 	reset_all();
 
 	my $str = '<chapter id="12" name="perl"  ></chapter>';
@@ -166,11 +166,11 @@ isa_ok $xml, 'XML::SAX::Test', 'XML::SAX::Test constructor';
 	$xml.done;
 	is $xml.string, '', 'string is empty';
 	is $xml.stack.elems, 0, 'stack is empty';
-	is @parsed.elems, 2, '2 elems';
-	is @parsed[0][0], 'start_elem', 'start_elem';
-	is @parsed[0][1], 'chapter', 'chapter start';
-	is @parsed[1][0], 'end_elem', 'end_elem';
-	is @parsed[1][1], 'chapter', 'chapter end';
+	my @expected = (
+		['start_elem', 'chapter'],
+		['end_elem', 'chapter'],
+	);
+	cmp_deep(@parsed, @expected, $str);
 	my $attr = @parsed[0][1].attributes;
 	is $attr.elems, 2, "2 attributes";
 	is $attr<id>, 12, 'id=12';
@@ -180,7 +180,7 @@ isa_ok $xml, 'XML::SAX::Test', 'XML::SAX::Test constructor';
 #----------------
 
 {
-	BEGIN { $test += 5 }
+	BEGIN { $test += 4 }
 	reset_all();
 
 	my $str = '<chapter> before <para>this is the text</para> after </chapter>';
@@ -189,7 +189,6 @@ isa_ok $xml, 'XML::SAX::Test', 'XML::SAX::Test constructor';
 	$xml.done;
 	is $xml.string, '', 'string is empty';
 	is $xml.stack.elems, 0, 'stack is empty';
-	is @parsed.elems, 7, '7 elems';
 
 	my @expected = (
 		['start_elem', 'chapter'],
@@ -235,7 +234,7 @@ isa_ok $xml, 'XML::SAX::Test', 'XML::SAX::Test constructor';
 }
 
 {
-	BEGIN { $test += 6 }
+	BEGIN { $test += 5 }
 	reset_all();
 	my $str = qq{<a><b id="23" /></a>};
 	diag $str;
@@ -244,7 +243,6 @@ isa_ok $xml, 'XML::SAX::Test', 'XML::SAX::Test constructor';
 	$xml.done;
 	is $xml.string, '', 'string is empty';
 	is $xml.stack.elems, 0, 'stack is empty';
-	is @parsed.elems, 4, '4 elems';
 
 	my @expected = (
 		['start_elem', 'a'],
