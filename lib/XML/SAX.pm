@@ -144,9 +144,17 @@ XML::SAX - a SAX XML parser
 
     XML::SAX::Element object have the following members:
 
-    name     - the name of the element
-    content  - an array of the various pieces of content
-    attributes - is a hash where the keys are the attrbute names and the values the attribute values
+self.stack holding the hierarchy of elements from the root to the current element.
+
+    self.stack[*-1] is the current element.
+
+    self.stack[*-2] is the parent element.
+
+name     - the name of the element
+
+content  - an array of the various pieces of content
+
+attributes - is a hash where the keys are the attrbute names and the values the attribute values
 
 	$elem.attributes<id>
 
