@@ -304,7 +304,7 @@ isa_ok $xml, 'XML::SAX::Test', 'XML::SAX::Test constructor';
 }
 
 {
-	BEGIN { $test += 21 }
+	BEGIN { $test += 2 }
 	reset_all();
 	diag 't/files/a.xml';
 
@@ -324,17 +324,33 @@ isa_ok $xml, 'XML::SAX::Test', 'XML::SAX::Test constructor';
 	is @parsed[5][1].content[1].get_content, "this is the text\n", 'content of para element';
 }
 
-sub cmp_deep(@real, @expected) {
+sub cmp_deep(@real, @expected, $name = '') {
 
-	is @real.elems, @expected.elems;
+	if @real.elems != @expected.elems {
+		ok 0, $name;
+		diag "Number of elements don't match. expected {@expected.elems} received {@real.elems}";
+		return False;
+	}
 
+	my $err = '';
 	for 0 .. @expected.elems-1 -> $i {
-		is @real[$i][0], @expected[$i][0], "event: {@expected[$i][0]}";
-		is @real[$i][1], @expected[$i][1], "type:  {@expected[$i][1]}";
+		for 0 .. 1 -> $j {
+			if @real[$i][$j] ne @expected[$i][$j] {
+				ok 0, $name;
+				diag "In row $i column $j. Expected {@expected[$i][$j]}  Received: {@real[$i][$j]}";
+				return False;
+			}
+		}
 		for 2 .. @expected[$i].elems-1 -> $j {
-			is @real[$i][1].content[$j-2], @expected[$i][$j];
+			if @real[$i][1].content[$j-2] ne @expected[$i][$j] {
+				ok 0, $name;
+				diag "In row $i content $j. Expected {@expected[$i][$j]}  Received: {@real[$i][1].content}";
+				return False;
+			}
 		}
 	}
+	ok 1, $name;
+	return True;
 }
 
 
@@ -344,3 +360,6 @@ sub reset_all() {
 	$xml.reset;
 }
 # <a href="http://url">link</a> after-link
+
+# vim: ft=perl6
+
