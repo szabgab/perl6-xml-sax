@@ -1,10 +1,13 @@
 use v6;
 
 use Test;
+my $test;
 
-plan 10+8+6+10+23+21+3+3+13+11+7;
+plan $test;
+
 
 use XML::SAX;
+BEGIN { $test += 1 }
 ok 1, 'ok';
 
 my @parsed;
@@ -21,16 +24,19 @@ class XML::SAX::Test is XML::SAX {
 }
 
 {
+	BEGIN { $test += 1 }
 	my $xml = XML::SAX.new;
 	isa_ok $xml, 'XML::SAX';
 }
 
 my $xml = XML::SAX::Test.new;
+BEGIN { $test += 1 }
 isa_ok $xml, 'XML::SAX::Test', 'XML::SAX::Test constructor';
 
 #----------------
 
 {
+	BEGIN { $test += 8 }
 	reset_all();
 	$xml.parse('<chapter>');
 	is @parsed.elems, 1, 'one element';
@@ -60,6 +66,7 @@ isa_ok $xml, 'XML::SAX::Test', 'XML::SAX::Test constructor';
 #----------------
 
 {
+	BEGIN { $test += 7 }
 	#@parsed = ();
 	reset_all();
 	$xml.parse('<chapter>');
@@ -77,6 +84,7 @@ isa_ok $xml, 'XML::SAX::Test', 'XML::SAX::Test constructor';
 #----------------
 
 {
+	BEGIN { $test += 1 }
 	reset_all();
 	my $exception;
 	{
@@ -92,6 +100,7 @@ isa_ok $xml, 'XML::SAX::Test', 'XML::SAX::Test constructor';
 #----------------
 
 {
+	BEGIN { $test += 3 }
 	reset_all();
 	my $exception;
 
@@ -109,6 +118,7 @@ isa_ok $xml, 'XML::SAX::Test', 'XML::SAX::Test constructor';
 #----------------
 
 {
+	BEGIN { $test += 1 }
 	reset_all();
 	my $exception;
 
@@ -127,6 +137,7 @@ isa_ok $xml, 'XML::SAX::Test', 'XML::SAX::Test constructor';
 #----------------
 
 {
+	BEGIN { $test += 1 }
 	reset_all();
 	my $exception;
 
@@ -147,6 +158,7 @@ isa_ok $xml, 'XML::SAX::Test', 'XML::SAX::Test constructor';
 #----------------
 
 {
+	BEGIN { $test += 10 }
 	reset_all();
 
 	my $str = '<chapter id="12" name="perl"  ></chapter>';
@@ -168,6 +180,7 @@ isa_ok $xml, 'XML::SAX::Test', 'XML::SAX::Test constructor';
 #----------------
 
 {
+	BEGIN { $test += 23 }
 	reset_all();
 
 	my $str = '<chapter> before <para>this is the text</para> after </chapter>';
@@ -210,6 +223,7 @@ isa_ok $xml, 'XML::SAX::Test', 'XML::SAX::Test constructor';
 #   parse data given in a file
 
 {
+	BEGIN { $test += 3 }
 	reset_all();
 	my $str = "<a>\n <b></b></a>";
 	diag $str;
@@ -222,6 +236,7 @@ isa_ok $xml, 'XML::SAX::Test', 'XML::SAX::Test constructor';
 }
 
 {
+	BEGIN { $test += 3 }
 	reset_all();
 	my $str = "<c><a><b></b> </a></c>";
 	diag $str;
@@ -234,6 +249,7 @@ isa_ok $xml, 'XML::SAX::Test', 'XML::SAX::Test constructor';
 }
 
 {
+	BEGIN { $test += 13 }
 	reset_all();
 	my $str = qq{<a><b id="23" /></a>};
 	diag $str;
@@ -262,6 +278,7 @@ isa_ok $xml, 'XML::SAX::Test', 'XML::SAX::Test constructor';
 }
 
 {
+	BEGIN { $test += 11 }
 	reset_all();
 	my $str = qq{<a> apple <!-- <b id="23" /> --> banana </a>};
 	diag $str;
@@ -287,6 +304,7 @@ isa_ok $xml, 'XML::SAX::Test', 'XML::SAX::Test constructor';
 }
 
 {
+	BEGIN { $test += 28 }
 	reset_all();
 	diag 't/files/a.xml';
 
