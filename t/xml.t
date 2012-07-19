@@ -249,7 +249,7 @@ isa_ok $xml, 'XML::SAX::Test', 'XML::SAX::Test constructor';
 }
 
 {
-	BEGIN { $test += 13 }
+	BEGIN { $test += 6 }
 	reset_all();
 	my $str = qq{<a><b id="23" /></a>};
 	diag $str;
@@ -260,17 +260,13 @@ isa_ok $xml, 'XML::SAX::Test', 'XML::SAX::Test constructor';
 	is $xml.stack.elems, 0, 'stack is empty';
 	is @parsed.elems, 4, '4 elems';
 
-	is @parsed[0][0], 'start_elem', 'start_elem';
-	is @parsed[0][1], 'a', 'a start';
-
-	is @parsed[1][0], 'start_elem', 'start_elem';
-	is @parsed[1][1], 'b', 'b start';
-
-	is @parsed[2][0], 'end_elem', 'end_elem';
-	is @parsed[2][1], 'b', 'b end';
-
-	is @parsed[3][0], 'end_elem', 'end_elem';
-	is @parsed[3][1], 'a', 'a end';
+	my @expected = (
+		['start_elem', 'a'],
+		['start_elem', 'b'],
+		['end_elem',   'b'],
+		['end_elem',   'a'],
+	);
+	cmp_deep(@parsed, @expected, $str);
 
 	my $attr = @parsed[1][1].attributes;
 	is $attr.elems, 1, "1 attributes";
