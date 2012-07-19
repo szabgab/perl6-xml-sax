@@ -278,7 +278,7 @@ isa_ok $xml, 'XML::SAX::Test', 'XML::SAX::Test constructor';
 }
 
 {
-	BEGIN { $test += 11 }
+	BEGIN { $test += 2 }
 	reset_all();
 	my $str = qq{<a> apple <!-- <b id="23" /> --> banana </a>};
 	diag $str;
@@ -287,20 +287,13 @@ isa_ok $xml, 'XML::SAX::Test', 'XML::SAX::Test constructor';
 	$xml.done;
 	is $xml.string, '', 'string is empty';
 
-	is @parsed[0][0], 'start_elem', 'start_elem';
-	is @parsed[0][1], 'a', 'a start';
-
-	is @parsed[1][0], 'content', 'content';
-	is @parsed[1][1], 'a', 'a';
-	is @parsed[1][1].content[0], ' apple ', 'apple';
-	#note @parsed[1].perl;
-
-	is @parsed[2][0], 'content', 'content';
-	is @parsed[2][1], 'a', 'a';
-	is @parsed[2][1].content[1], ' banana ', 'banana';
-
-	is @parsed[3][0], 'end_elem', 'end_elem';
-	is @parsed[3][1], 'a', 'a end';
+	my @expected = (
+		['start_elem', 'a'],
+		['content',    'a', ' apple '],
+		['content',    'a', ' apple ', ' banana '],
+		['end_elem',   'a'],
+	);
+	cmp_deep(@parsed, @expected, $str);
 }
 
 {
@@ -337,14 +330,14 @@ sub cmp_deep(@real, @expected, $name = '') {
 		for 0 .. 1 -> $j {
 			if @real[$i][$j] ne @expected[$i][$j] {
 				ok 0, $name;
-				diag "In row $i column $j. Expected {@expected[$i][$j]}  Received: {@real[$i][$j]}";
+				diag "In row $i column $j.\n  Expected: '{@expected[$i][$j]}'\n  Received: '{@real[$i][$j]}'";
 				return False;
 			}
 		}
 		for 2 .. @expected[$i].elems-1 -> $j {
 			if @real[$i][1].content[$j-2] ne @expected[$i][$j] {
 				ok 0, $name;
-				diag "In row $i content $j. Expected {@expected[$i][$j]}  Received: {@real[$i][1].content}";
+				diag "In row $i content $j.\n  Expected: '{@expected[$i][$j]}'\n  Received: '{@real[$i][1].content[$j-2]}'";
 				return False;
 			}
 		}
