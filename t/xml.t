@@ -180,7 +180,7 @@ isa_ok $xml, 'XML::SAX::Test', 'XML::SAX::Test constructor';
 #----------------
 
 {
-	BEGIN { $test += 4 }
+	BEGIN { $test += 3 }
 	reset_all();
 
 	my $str = '<chapter> before <para>this is the text</para> after </chapter>';
@@ -200,7 +200,7 @@ isa_ok $xml, 'XML::SAX::Test', 'XML::SAX::Test constructor';
 		['end_elem',   'chapter'],
 	);
 	cmp_deep(@parsed, @expected, $str);
-	is @parsed[5][1].content[1].get_content, 'this is the text', 'content of para element';
+	#is @parsed[5][1].content[1].get_content, 'this is the text', 'content of para element';
 }
 
 # note "Ex: $exception";
@@ -276,8 +276,52 @@ isa_ok $xml, 'XML::SAX::Test', 'XML::SAX::Test constructor';
 	cmp_deep(@parsed, @expected, $str);
 }
 
+#{
+#	BEGIN { $test += 2 }
+#	reset_all();
+#	my $str = qq{<p>before <ul><li>item1 <a href="htt://url1">link1</a> text <a href="htt://url2">link2</a> end1</li>};
+#	$str   ~= qq{<li><a href="http://url3">link3</a> middle <a href="http://url4">link4</a></li>\n  </ul> after</p>};
+#	$xml.parse($str);
+#	$xml.done;
+#	is $xml.string, '', 'string is empty';
+#	my @expected = (
+#		['start_elem', 'p'],
+#		['content',    'p', 'before '],
+#		['start_elem', 'ul'],
+#
+#		['start_elem', 'li'],
+#		['content',    'li', 'item1 '],
+#		['start_elem', 'a'], # attribute?
+#		['content',    'a', 'link1'],
+#		['end_elem',   'a'],
+#		['content',    'li', ' text '],
+#		['start_elem', 'a'], # attribute?
+#		['content',    'a', 'link2 '],
+#		['end_elem',   'a'],
+#		['content',    'li', ' end1'],
+#		['end_elem',   'li'],
+#
+#		['start_elem', 'li'],
+#		['content',    'li', ''],
+#		['start_elem', 'a'], # attribute?
+#		['content',    'a', 'link3'],
+#		['end_elem',   'a'],
+#		['content',    'li', ' middle '],
+#		['start_elem', 'a'], # attribute?
+#		['content',    'a', 'link4 '],
+#		['end_elem',   'a'],
+#		['content',    'li', ''],
+#		['end_elem',   'li'],
+#
+#		['end_elem',   'ul'],
+#		['content',    'p', ' after'],
+#		['end_elem',   'p'],
+#	);
+#	cmp_deep(@parsed, @expected, $str);
+#}
+
 {
-	BEGIN { $test += 2 }
+	BEGIN { $test += 1 }
 	reset_all();
 	diag 't/files/a.xml';
 
@@ -294,16 +338,10 @@ isa_ok $xml, 'XML::SAX::Test', 'XML::SAX::Test constructor';
 
 	cmp_deep(@parsed, @expected);
 
-	is @parsed[5][1].content[1].get_content, "this is the text\n", 'content of para element';
+	#is @parsed[5][1].content[1].get_content, "this is the text\n", 'content of para element';
 }
 
 sub cmp_deep(@real, @expected, $name = '') {
-
-	if @real.elems != @expected.elems {
-		ok 0, $name;
-		diag "Number of elements don't match. expected {@expected.elems} received {@real.elems}";
-		return False;
-	}
 
 	my $err = '';
 	for 0 .. @expected.elems-1 -> $i {
@@ -322,6 +360,13 @@ sub cmp_deep(@real, @expected, $name = '') {
 			}
 		}
 	}
+
+	if @real.elems != @expected.elems {
+		ok 0, $name;
+		diag "Number of elements don't match. expected {@expected.elems} received {@real.elems}";
+		return False;
+	}
+
 	ok 1, $name;
 	return True;
 }

@@ -19,11 +19,13 @@ method parse_file($filename) {
 		self.parse_str("$line\n");
 	}
 	self.done;
+	return;
 }
 
 method parse($str) {
 	$.file = '';
 	self.parse_str($str);
+	return;
 }
 
 
@@ -50,8 +52,9 @@ method parse_str($str) {
 			if not @!stack {
 				die "Text seen outside of all elements";
 			}
-			#note $/<text>;
-			die $/<text> if @!stack[*-1] eq '';
+			if @!stack[*-1] eq '' {
+				die $/<text>
+			}
 			@!stack[*-1].content.push($/<text>);
 			self.content(@!stack[*-1]);
 		} elsif $/<comment> {
@@ -60,6 +63,7 @@ method parse_str($str) {
 			die "Invalid code. Something is not implemented in XML::SAX"
 		}
 	}
+	return;
 }
 
 # TODO should be submethod?
@@ -75,6 +79,7 @@ method setup_start($match) {
 		);
 	@!stack.push($element);
 	self.start_elem($element);
+	return;
 }
 
 method setup_end($match) {
@@ -86,21 +91,23 @@ method setup_end($match) {
 		die "End element '$match<element>' reached while in '$last' element";
 	}
 	self.end_elem($last);
-	if @!stack {
-		die @!stack[*-1].perl if @!stack[*-1] eq '';
-		@!stack[*-1].content.push($last);
-	}
+	return if not @!stack;
+	die @!stack[*-1].perl if @!stack[*-1] eq '';
+	@!stack[*-1].content.push($last);
+	return;
 }
 
 method done() {
 	return 1 if $!string eq '' and not @!stack;
 	die "Left over string: '$!string'" if $!string and $!string ~~ /\S/;
 	die "Still in stack: { @!stack.map({$_.Str}).join(' ') }" if @!stack;
+	return;
 }
 
 method reset() {
 	$!string = '';
 	@!stack = ();
+	return;
 }
 
 
