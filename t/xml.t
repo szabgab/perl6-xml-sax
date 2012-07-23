@@ -36,15 +36,15 @@ isa_ok $xml, 'XML::SAX::Test', 'XML::SAX::Test constructor';
 #----------------
 
 {
-	BEGIN { $test += 8 }
+	BEGIN { $test += 7 }
 	reset_all();
-	$xml.parse('<chapter>');
+	my $str = '<chapter>';
+	$xml.parse($str);
 	is @parsed.elems, 1, 'one element';
-	is @parsed[0][0], 'start_elem', 'start_elem';
-	is @parsed[0][1], 'chapter', 'chapter';
-	#ok @parsed ~~ ['chapter'], 'parsed chapter';
-	#note @parsed.perl;
-	#note ;
+	my @expected = (
+		['start_elem', 'chapter'],
+	);
+	cmp_deep(@parsed, @expected, $str);
 
 	{
 		$xml.done;
@@ -68,6 +68,7 @@ isa_ok $xml, 'XML::SAX::Test', 'XML::SAX::Test constructor';
 {
 	BEGIN { $test += 3 }
 	#@parsed = ();
+	my $str = "<chapter></chapter>";
 	reset_all();
 	$xml.parse('<chapter>');
 	$xml.parse('</chapter>');
@@ -78,7 +79,7 @@ isa_ok $xml, 'XML::SAX::Test', 'XML::SAX::Test constructor';
 		['start_elem', 'chapter'],
 		['end_elem', 'chapter'],
 	);
-	cmp_deep(@parsed, @expected, "<chapter></chapter>");
+	cmp_deep(@parsed, @expected, $str);
 }
 
 #----------------
@@ -161,7 +162,7 @@ isa_ok $xml, 'XML::SAX::Test', 'XML::SAX::Test constructor';
 #----------------
 
 {
-	BEGIN { $test += 6 }
+	BEGIN { $test += 3 }
 	reset_all();
 
 	my $str = '<chapter id="12" name="perl"  ></chapter>';
@@ -170,14 +171,10 @@ isa_ok $xml, 'XML::SAX::Test', 'XML::SAX::Test constructor';
 	is $xml.string, '', 'string is empty';
 	is $xml.stack.elems, 0, 'stack is empty';
 	my @expected = (
-		['start_elem', 'chapter'],
+		['start_elem', 'chapter', {id => 12, name => 'perl'}],
 		['end_elem', 'chapter'],
 	);
 	cmp_deep(@parsed, @expected, $str);
-	my $attr = @parsed[0][1].attributes;
-	is $attr.elems, 2, "2 attributes";
-	is $attr<id>, 12, 'id=12';
-	is $attr<name>, 'perl', 'name=perl';
 }
 
 #----------------
@@ -237,7 +234,7 @@ isa_ok $xml, 'XML::SAX::Test', 'XML::SAX::Test constructor';
 }
 
 {
-	BEGIN { $test += 5 }
+	BEGIN { $test += 3 }
 	reset_all();
 	my $str = qq{<a><b id="23" /></a>};
 	diag $str;
@@ -249,15 +246,11 @@ isa_ok $xml, 'XML::SAX::Test', 'XML::SAX::Test constructor';
 
 	my @expected = (
 		['start_elem', 'a'],
-		['start_elem', 'b'],
+		['start_elem', 'b', {id => 23}],
 		['end_elem',   'b'],
 		['end_elem',   'a'],
 	);
 	cmp_deep(@parsed, @expected, $str);
-
-	my $attr = @parsed[1][1].attributes;
-	is $attr.elems, 1, "1 attributes";
-	is $attr<id>, 23, 'id=23';
 }
 
 {
@@ -355,11 +348,35 @@ sub cmp_deep(@real, @expected, $name = '') {
 				return False;
 			}
 		}
-		for 2 .. @expected[$i].elems-1 -> $j {
-			if @real[$i][1].content[$j-2] ne @expected[$i][$j] {
+	#is $attr<id>, 12, 'id=12';
+	#is $attr<name>, 'perl', 'name=perl';
+		if @real[$i][0] eq 'start_elem' {
+			my $attr = @real[$i][1].attributes;
+			my $expected_attr = @expected[$i][2] // {};
+			for $expected_attr.keys -> $k {
+				#if not exists $attr{$k} {
+				#	ok 0, $name;
+				#	diag "In row $i Expected attribute '$k' does not exist\n ";
+				#	return False;
+				#}
+				if $expected_attr{$k} ne $attr{$k} {
+					ok 0, $name;
+					diag "In row $i Expected attribute '$expected_attr{$k}' is not the same as the Received $attr{$k}\n ";
+					return False;
+				}
+			}
+			if $attr.elems != $expected_attr.elems {
 				ok 0, $name;
-				diag "In row $i content $j.\n  Expected: '{@expected[$i][$j]}'\n  Received: '{@real[$i][1].content[$j-2]}'";
+				diag "Incorrect number of attributes in row $i.\n ";
 				return False;
+			}
+		} else {
+			for 2 .. @expected[$i].elems-1 -> $j {
+				if @real[$i][1].content[$j-2] ne @expected[$i][$j] {
+					ok 0, $name;
+					diag "In row $i content $j.\n  Expected: '{@expected[$i][$j]}'\n  Received: '{@real[$i][1].content[$j-2]}'";
+					return False;
+				}
 			}
 		}
 	}
