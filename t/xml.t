@@ -46,14 +46,16 @@ isa_ok $xml, 'XML::SAX::Test', 'XML::SAX::Test constructor';
 	);
 	cmp_deep(@parsed, @expected, $str);
 
+	my $exception;
 	{
 		$xml.done;
 		CATCH {
 			default {
-				is $_, 'Still in stack: chapter', 'exception still in stack';
+				$exception = $_;
 			}
 		}
 	}
+	is $exception, 'Still in stack: chapter', 'exception still in stack';
 
 	is $xml.string, '', 'string is empty';
 	is $xml.stack[0], 'chapter', 'stack is chapter';
@@ -67,7 +69,6 @@ isa_ok $xml, 'XML::SAX::Test', 'XML::SAX::Test constructor';
 
 {
 	BEGIN { $test += 3 }
-	#@parsed = ();
 	my $str = "<chapter></chapter>";
 	reset_all();
 	$xml.parse('<chapter>');
