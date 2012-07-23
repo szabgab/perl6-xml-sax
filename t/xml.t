@@ -19,7 +19,7 @@ class XML::SAX::Test is XML::SAX {
 		@parsed.push(['end_elem', $elem]);
 	}
 	method content($elem) {
-		@parsed.push(['content', $elem]);
+		@parsed.push(['content', $elem, $elem.content]);
 	}
 }
 
@@ -197,7 +197,7 @@ isa_ok $xml, 'XML::SAX::Test', 'XML::SAX::Test constructor';
 		['start_elem', 'para'],
 		['content',    'para', 'this is the text'],
 		['end_elem',   'para'],
-		['content',    'chapter', ' before ', ' after '],
+		['content',    'chapter', ' after '],
 		['end_elem',   'chapter'],
 	);
 	cmp_deep(@parsed, @expected, $str);
@@ -267,7 +267,7 @@ isa_ok $xml, 'XML::SAX::Test', 'XML::SAX::Test constructor';
 	my @expected = (
 		['start_elem', 'a'],
 		['content',    'a', ' apple '],
-		['content',    'a', ' apple ', ' banana '],
+		['content',    'a', ' banana '],
 		['end_elem',   'a'],
 	);
 	cmp_deep(@parsed, @expected, $str);
@@ -329,7 +329,7 @@ isa_ok $xml, 'XML::SAX::Test', 'XML::SAX::Test constructor';
 		['start_elem', 'para'                        ],
 		['content',    'para',   "this is the text\n"],
 		['end_elem',   'para'                        ],
-		['content',    'chapter', " before \n", "\n  after\n  "],
+		['content',    'chapter', "\n  after\n  "],
 		['end_elem',   'chapter'                     ],
 	);
 
@@ -384,9 +384,9 @@ sub cmp_deep(@real, @expected, $name = '') {
 			}
 		} else {
 			for 2 .. @expected[$i].elems-1 -> $j {
-				if @real[$i][1].content[$j-2] ne @expected[$i][$j] {
+				if @real[$i][$j] ne @expected[$i][$j] {
 					ok 0, $name;
-					diag "In row $i content $j.\n  Expected: '{@expected[$i][$j]}'\n  Received: '{@real[$i][1].content[$j-2]}'";
+					diag "In row $i content $j.\n  Expected: '{@expected[$i][$j]}'\n  Received: '{@real[$i][1][$j]}'";
 					return False;
 				}
 			}

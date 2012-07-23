@@ -55,7 +55,8 @@ method parse_str($str) {
 			if @!stack[*-1] eq '' {
 				die $/<text>
 			}
-			@!stack[*-1].content.push($/<text>);
+			#@!stack[*-1].content.push($/<text>);
+			@!stack[*-1].content = $/<text>;
 			self.content(@!stack[*-1]);
 		} elsif $/<comment> {
 			# do nothing;
