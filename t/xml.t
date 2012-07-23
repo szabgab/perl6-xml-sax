@@ -197,7 +197,7 @@ isa_ok $xml, 'XML::SAX::Test', 'XML::SAX::Test constructor';
 		['start_elem', 'para'],
 		['content',    'para', 'this is the text'],
 		['end_elem',   'para'],
-		['content',    'chapter', ' before ', 'para', ' after '],
+		['content',    'chapter', ' before ', ' after '],
 		['end_elem',   'chapter'],
 	);
 	cmp_deep(@parsed, @expected, $str);
@@ -329,7 +329,7 @@ isa_ok $xml, 'XML::SAX::Test', 'XML::SAX::Test constructor';
 		['start_elem', 'para'                        ],
 		['content',    'para',   "this is the text\n"],
 		['end_elem',   'para'                        ],
-		['content',    'chapter', " before \n", 'para', "\n  after\n  "],
+		['content',    'chapter', " before \n", "\n  after\n  "],
 		['end_elem',   'chapter'                     ],
 	);
 

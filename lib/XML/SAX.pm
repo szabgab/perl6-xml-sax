@@ -93,7 +93,9 @@ method setup_end($match) {
 	self.end_elem($last);
 	return if not @!stack;
 	die @!stack[*-1].perl if @!stack[*-1] eq '';
-	@!stack[*-1].content.push($last);
+	# Having the subelement part of the content of the parent would mean that the top
+	# element actually contains the whole tree - that we have all the DOM in memory
+	#@!stack[*-1].content.push($last);
 	return;
 }
 
