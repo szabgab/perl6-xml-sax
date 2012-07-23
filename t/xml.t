@@ -104,15 +104,18 @@ isa_ok $xml, 'XML::SAX::Test', 'XML::SAX::Test constructor';
 	reset_all();
 	my $exception;
 
-	$xml.parse('<chapter><page></page></chapter>');
+	my $str = '<chapter><page></page></chapter>';
+	$xml.parse($str);
 	$xml.done;
 	is $xml.string, '', 'string is empty';
 	is $xml.stack.elems, 0, 'stack is empty';
-	is @parsed.elems, 4, '4 elems';
-	#is @parsed[0][0], 'start_elem', 'start_elem';
-	#is @parsed[0][1], 'chapter', 'chapter start';
-	#is @parsed[1][0], 'end_elem', 'end_elem';
-	#is @parsed[1][1], 'chapter', 'chapter end';
+	my @expected = (
+		['start_elem', 'chapter'],
+		['start_elem', 'page'],
+		['end_elem', 'page'],
+		['end_elem', 'chapter'],
+	);
+	cmp_deep(@parsed, @expected, $str);
 }
 
 #----------------
