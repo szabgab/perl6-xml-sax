@@ -361,14 +361,25 @@ sub cmp_deep(@real, @expected, $name = '') {
 				#}
 				if $expected_attr{$k} ne $attr{$k} {
 					ok 0, $name;
-					diag "In row $i Expected attribute '$expected_attr{$k}' is not the same as the Received $attr{$k}\n ";
+					diag "In row $i Expected attribute '$expected_attr{$k}' is not the same as the Received $attr{$k}\n";
 					return False;
 				}
 			}
 			if $attr.elems != $expected_attr.elems {
 				ok 0, $name;
-				diag "Incorrect number of attributes in row $i.\n ";
+				diag "Incorrect number of attributes in row $i.\n";
 				return False;
+			}
+			if @real[$i].elems > 3 {
+					ok 0, $name;
+					diag "In row $i (start_elem) number of elements is {@real[$i].elems} which is more than 3\n" ~ @real[$i].perl;
+					return False;
+			}
+		} elsif @real[$i][0] eq 'end_elem' {
+			if @real[$i].elems > 2 {
+					ok 0, $name;
+					diag "In row $i (end_elem) number of elements is {@real[$i].elems} which is more than 2\n" ~ @real[$i].perl;
+					return False;
 			}
 		} else {
 			for 2 .. @expected[$i].elems-1 -> $j {
