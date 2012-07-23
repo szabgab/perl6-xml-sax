@@ -52,9 +52,9 @@ method parse_str($str) {
 			if not @!stack {
 				die "Text seen outside of all elements";
 			}
-			if @!stack[*-1] eq '' {
-				die $/<text>
-			}
+	#		if @!stack[*-1] eq '' {
+	#			die $/<text>
+	#		}
 			#@!stack[*-1].content.push($/<text>);
 			@!stack[*-1].content = $/<text>;
 			self.content(@!stack[*-1]);
@@ -93,7 +93,8 @@ method setup_end($match) {
 	}
 	self.end_elem($last);
 	return if not @!stack;
-	die @!stack[*-1].perl if @!stack[*-1] eq '';
+	#die @!stack[*-1].perl if @!stack[*-1] eq '';
+
 	# Having the subelement part of the content of the parent would mean that the top
 	# element actually contains the whole tree - that we have all the DOM in memory
 	#@!stack[*-1].content.push($last);
