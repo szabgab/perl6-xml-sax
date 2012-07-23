@@ -273,49 +273,49 @@ isa_ok $xml, 'XML::SAX::Test', 'XML::SAX::Test constructor';
 	cmp_deep(@parsed, @expected, $str);
 }
 
-#{
-#	BEGIN { $test += 2 }
-#	reset_all();
-#	my $str = qq{<p>before <ul><li>item1 <a href="htt://url1">link1</a> text <a href="htt://url2">link2</a> end1</li>};
-#	$str   ~= qq{<li><a href="http://url3">link3</a> middle <a href="http://url4">link4</a></li>\n  </ul> after</p>};
-#	$xml.parse($str);
-#	$xml.done;
-#	is $xml.string, '', 'string is empty';
-#	my @expected = (
-#		['start_elem', 'p'],
-#		['content',    'p', 'before '],
-#		['start_elem', 'ul'],
-#
-#		['start_elem', 'li'],
-#		['content',    'li', 'item1 '],
-#		['start_elem', 'a'], # attribute?
-#		['content',    'a', 'link1'],
-#		['end_elem',   'a'],
-#		['content',    'li', ' text '],
-#		['start_elem', 'a'], # attribute?
-#		['content',    'a', 'link2 '],
-#		['end_elem',   'a'],
-#		['content',    'li', ' end1'],
-#		['end_elem',   'li'],
-#
-#		['start_elem', 'li'],
+{
+	BEGIN { $test += 2 }
+	reset_all();
+	my $str = qq{<p>before <ul><li>item1 <a href="http://url1">link1</a> text <a href="http://url2">link2</a> end1</li>};
+	$str   ~= qq{<li><a href="http://url3">link3</a> middle <a href="http://url4">link4</a></li>\n  </ul> after</p>};
+	$xml.parse($str);
+	$xml.done;
+	is $xml.string, '', 'string is empty';
+	my @expected = (
+		['start_elem', 'p'],
+		['content',    'p', 'before '],
+		['start_elem', 'ul'],
+
+		['start_elem', 'li'],
+		['content',    'li', 'item1 '],
+		['start_elem', 'a', { href => 'http://url1' }],
+		['content',    'a', 'link1'],
+		['end_elem',   'a'],
+		['content',    'li', ' text '],
+		['start_elem', 'a', { href => 'http://url2' }],
+		['content',    'a', 'link2'],
+		['end_elem',   'a'],
+		['content',    'li', ' end1'],
+		['end_elem',   'li'],
+
+		['start_elem', 'li'],      # second row
 #		['content',    'li', ''],
-#		['start_elem', 'a'], # attribute?
-#		['content',    'a', 'link3'],
-#		['end_elem',   'a'],
-#		['content',    'li', ' middle '],
-#		['start_elem', 'a'], # attribute?
-#		['content',    'a', 'link4 '],
-#		['end_elem',   'a'],
+		['start_elem', 'a', { href => 'http://url3' }],
+		['content',    'a', 'link3'],
+		['end_elem',   'a'],
+		['content',    'li', ' middle '],
+		['start_elem', 'a', { href => 'http://url4' }],
+		['content',    'a', 'link4'],
+		['end_elem',   'a'],
 #		['content',    'li', ''],
-#		['end_elem',   'li'],
-#
-#		['end_elem',   'ul'],
-#		['content',    'p', ' after'],
-#		['end_elem',   'p'],
-#	);
-#	cmp_deep(@parsed, @expected, $str);
-#}
+		['end_elem',   'li'],
+
+		['end_elem',   'ul'],
+		['content',    'p', ' after'],
+		['end_elem',   'p'],
+	);
+	cmp_deep(@parsed, @expected, $str);
+}
 
 {
 	BEGIN { $test += 1 }
@@ -383,12 +383,11 @@ sub cmp_deep(@real, @expected, $name = '') {
 					return False;
 			}
 		} else {
-			for 2 .. @expected[$i].elems-1 -> $j {
-				if @real[$i][$j] ne @expected[$i][$j] {
-					ok 0, $name;
-					diag "In row $i content $j.\n  Expected: '{@expected[$i][$j]}'\n  Received: '{@real[$i][1][$j]}'";
-					return False;
-				}
+			my $expected_content = @expected[$i][2] // '';
+			if @real[$i][2] ne $expected_content {
+				ok 0, $name;
+				diag "In row $i incorrect content.\n  Expected: '$expected_content'\n  Received: '{@real[$i][2]}'";
+				return False;
 			}
 		}
 	}
