@@ -31,13 +31,19 @@ method parse($str) {
 
 method parse_str($str) {
 	# insert a space if not tag boundary
-	if $!string.chars and $str.chars and substr($!string, *-1) ne '>' and substr($str, 0, 1) ne '<' {
+	#note "str: $str";
+
+	if $!string.chars and
+		$str.chars and
+		substr($!string, *-1) ne '>' and
+		substr($str, 0, 1) ne '<' {
+
 		$!string ~= ' ';
 	}
 	$!string ~= $str;
 
 	while XML::SAX::Grammar.parse($!string) {
-		#note $!string;
+		#note "string: $!string";
 		#note $/;
 		$!string .= substr($/.to);
 

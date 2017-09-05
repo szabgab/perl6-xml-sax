@@ -167,6 +167,7 @@ isa_ok $xml, 'XML::SAX::Test', 'XML::SAX::Test constructor';
 	reset_all();
 
 	my $str = '<chapter id="12" name="perl"  ></chapter>';
+	#my $str = '<chapter id></chapter>';
 	$xml.parse($str);
 	$xml.done;
 	is $xml.string, '', 'string is empty';
